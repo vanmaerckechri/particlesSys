@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Particles System</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+	<div id="ptcSysContainer" class="ptcSysContainer">
+		<div id="ptcSysUi" class="ptcSysUi">
+			<button id="ptcSysStartStopButton" class="ptcSysStartStopButton">start</button>
+			<div id="ptcSysSlidersContainer" class="ptcSysSlidersContainer">
+				<label for="ptcSysDensitySlider">density: <span id="ptcSysDensityValue" class="ptcSysDensityValue">1</span></label>
+				<input id="ptcSysDensitySlider" class="ptcSysDensitySlider" name="ptcSysDensitySlider" type="range" min="1" max="100" value="1">
+				<label for="ptcSysEmitterSpeedSlider">emitter speed: <span id="ptcSysEmitterSpeedValue" class="ptcSysEmitterSpeedValue">1</span></label>
+				<input id="ptcSysEmitterSpeedSlider" class="ptcSysEmitterSpeedSlider" name="ptcSysEmitterSpeedSlider" type="range" min="1" max="100" value="1">
+			</div>
+		</div>
+		<canvas id="ptcSysCanvas" class="ptcSysCanvas"></canvas>
+	</div>
+	<script type= "text/javascript" src="assets/js/ptcsys.js"></script>
+</body>
+</html>
