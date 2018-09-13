@@ -58,6 +58,9 @@ let PtcSys = class
 			gravity: 9.8
 		}
 		this.particles = [];
+		// var: frames by sec
+		this.frameBySec = 0;
+		this.frameBySecTimeStart;
 	}
 
 	drawParticles()
@@ -85,9 +88,20 @@ let PtcSys = class
 		}
 	}
 
+	calculFrameBySec()
+	{
+		let frameBySecTimeStart = this.frameBySecTimeStart;
+		this.frameBySecTimeStart = this.countTime(this.frameBySecTimeStart, 1000);
+		if (frameBySecTimeStart != this.frameBySecTimeStart)
+		{
+			console.log(this.frameBySec);
+			this.frameBySec = 0;
+		}
+		this.frameBySec += 1;
+	}
+
 	deleteParticles()
 	{
-		
 	}
 
 	createParticles()
@@ -138,6 +152,7 @@ let PtcSys = class
 		that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
 		that.createParticles();
 		that.drawParticles();
+		that.calculFrameBySec();
 		that.particlesEngine["mainLoop"] = window.requestAnimationFrame(that.launchMainLoop.bind(this, that));
 	}
 
