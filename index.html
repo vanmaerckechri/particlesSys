@@ -17,6 +17,15 @@
 				<label for="ptcSysEmitterSpeedSlider">emitter speed: <span id="ptcSysEmitterSpeedValue" class="ptcSysEmitterSpeedValue">1</span></label>
 				<input id="ptcSysEmitterSpeedSlider" class="ptcSysEmitterSpeedSlider" name="ptcSysEmitterSpeedSlider" type="range" min="1" max="100" value="1">
 			</div>
+			<div id="ptcSysShapeAndSizeContainer" class="ptcSysShapeAndSizeContainer">
+				<label for="ptcSysShape">shape</label>
+				<select id="ptcSysShape" class="ptcSysShape" name="ptcSysShape">
+					<option value="square">square</option>
+					<option value="circle">circle</option>
+				</select>
+				<label for="ptcSysSize">size</label>
+				<input id="ptcSysSize" class="ptcSysSize" name="ptcSysSize" type="number" step="1" value="1" min="1" max="8">
+			</div>
 		</div>
 		<canvas id="ptcSysCanvas" class="ptcSysCanvas"></canvas>
 	</div>

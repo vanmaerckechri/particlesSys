@@ -39,8 +39,6 @@ let PtcSys = class
 	{
 		this.canvas = document.getElementById("ptcSysCanvas");
 		this.ctx = this.canvas.getContext("2d");
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
 
 		this.startStopButton = document.getElementById("ptcSysStartStopButton");
 		this.densitySlider = document.getElementById("ptcSysDensitySlider");
@@ -59,19 +57,78 @@ let PtcSys = class
 		}
 		this.particles = [];
 		// var: frames by sec
-		this.frameBySec = 0;
+		this.frameBySec = 60;
 		this.frameBySecTimeStart;
 	}
 
-	drawParticles()
+	deleteParticles(particlesToDelete)
 	{
+		particlesToDelete = typeof particlesToDelete == "number" ? [particlesToDelete] : particlesToDelete;
+
+		if (particlesToDelete.length != 0)
+		{
+			for (let i = particlesToDelete.length - 1; i >= 0; i--)
+			{
+				this.particles[particlesToDelete[i]] = null;
+				this.particles.splice(particlesToDelete[i], 1);
+			}
+		}
+	}
+
+	drawCanvasLimits()
+	{
+		let actifCanvasWidth = this.canvas.width - 100;
+		let actifCanvasHeight = this.canvas.height - 100;
+
+		this.ctx.beginPath();
+		this.ctx.lineWidth = "1";
+		this.ctx.strokeStyle = "black";
+		this.ctx.rect(50, 50, actifCanvasWidth, actifCanvasHeight);	
+		this.ctx.stroke();	
+	}
+
+	drawParticles(particle)
+	{
+		this.ctx.beginPath();
+		this.ctx.lineWidth = "1";
+		this.ctx.strokeStyle = particle["color"];
+
+		if (particle["shape"] == "circle")
+		{
+			this.ctx.arc(particle["posX"], particle["posY"], particle["size"], 0, Math.PI * 2, true);//(x, y, r, ?)
+		}
+		else if (particle["shape"] == "square")
+		{
+			this.ctx.rect(particle["posX"], particle["posY"], particle["size"], particle["size"]);
+		}
+
+		this.ctx.stroke();
+		particle["posY"] += particle["gravity"] / 10;
+	}
+
+	listenParticles()
+	{
+		let particlesToDelete = [];
+		let canvasHeight = this.canvas.offsetHeight;
+		let canvasWidth = this.canvas.offsetWidth;
+		let canvasTop = this.canvas.offsetTop;
+		let canvasLeft = this.canvas.offsetLeft;
+
 		for (let i = this.particles.length - 1; i >= 0; i--)
 		{
-			this.ctx.beginPath();
-			this.ctx.arc(this.particles[i]["posX"], this.particles[i]["posY"], 10, 0, Math.PI * 2, true);//(x, y, r, ?)
-			this.ctx.stroke();
-			this.particles[i]["posY"] += this.particles[i]["gravity"] / 10;
+			if (typeof this.particles[i] != "undefined")
+			{
+				// draw
+				this.drawParticles(this.particles[i]);
+				// list particles to delete
+				if (this.particles[i]["posY"] < canvasTop - 100 || this.particles[i]["posY"] > canvasHeight + 100 || this.particles[i]["posX"] < -100 || this.particles[i]["posX"] > canvasWidth + 100)
+				{
+					particlesToDelete.push(i);
+				}
+			}
 		}
+		// delete particle(s)
+		this.deleteParticles(particlesToDelete);
 	}
 
 	countTime(timeStart, milliSec)
@@ -100,14 +157,12 @@ let PtcSys = class
 		this.frameBySec += 1;
 	}
 
-	deleteParticles()
-	{
-	}
-
 	createParticles()
 	{
+		let ptcSysShape = document.getElementById("ptcSysShape").value;
+		let ptcSysSize = document.getElementById("ptcSysSize").value;
 		let particlesTimeStartSave = this.particlesTimeStart;
-		this.particlesTimeStart = this.countTime(this.particlesTimeStart, 2000);// need to link millisec with emitter speed
+		this.particlesTimeStart = this.countTime(this.particlesTimeStart, this.particlesEngine["emitterSpeed"]);// need to link millisec with emitter speed
 
 		if (particlesTimeStartSave != this.particlesTimeStart)
 		{
@@ -120,12 +175,19 @@ let PtcSys = class
 				{
 					posX: 0,
 					posY: 0,
-					color: "white",
+					shape: "",
+					color: "black",
+					size: 1,
 					gravity: this.particlesEngine["gravity"]
 				}
+				// shape
+				particle["shape"] = ptcSysShape;
+				particle["size"] = ptcSysSize;
+				// position
 				let widthStart = Math.round(currentWidthPart * widthPart);
 				let widthEnd = Math.round((currentWidthPart * widthPart) + widthPart);
 				particle["posX"] = Math.random() * (widthEnd - widthStart) + widthStart;
+
 				this.particles.push(particle);
 				currentWidthPart += 1;
 			}
@@ -137,13 +199,13 @@ let PtcSys = class
 		let canvasWidth = that.canvas.width;
 		let densitySliderValue = that.densitySlider.value;
 		
-		that.particlesEngine["density"] = parseInt(densitySliderValue, 10);
+		that.particlesEngine["density"] = parseInt(densitySliderValue / 2, 10);
 		that.densityDisplayValue.innerText = densitySliderValue;
 	}
 
 	updateEmitterSpeed(that)
 	{
-		that.particlesEngine["emitterSpeed"] = parseInt(that.emitterSpeedSlider, 10);
+		that.particlesEngine["emitterSpeed"] = parseInt(30000 / that.emitterSpeedSlider.value, 10);
 		that.emitterSpeedDisplayValue.innerText = that.emitterSpeedSlider.value;
 	}
 
@@ -151,7 +213,7 @@ let PtcSys = class
 	{
 		that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
 		that.createParticles();
-		that.drawParticles();
+		that.listenParticles();
 		that.calculFrameBySec();
 		that.particlesEngine["mainLoop"] = window.requestAnimationFrame(that.launchMainLoop.bind(this, that));
 	}
@@ -175,16 +237,30 @@ let PtcSys = class
 		}
 	}
 
+	updateCanvasSize(that)
+	{
+		let ptcSysActiveZoneCanvas = document.getElementById("ptcSysActiveZoneCanvas");
+
+		that.canvas.width = window.innerWidth - document.getElementById("ptcSysUi").offsetWidth;
+		that.canvas.height = window.innerHeight;
+		that.particles = [];
+	}
+
 	init()
 	{
 		let that = this;
+		this.updateCanvasSize(that);
 
 		this.densitySlider.value = 1;
 		this.emitterSpeedSlider.value = 1;
+		this.updateDensity(that);
+		this.updateEmitterSpeed(that);
 
 		this.startStopButton.addEventListener("click", this.startStop.bind(this, that), false);
 		this.densitySlider.addEventListener("input", this.updateDensity.bind(this, that), false);
 		this.emitterSpeedSlider.addEventListener("input", this.updateEmitterSpeed.bind(this, that), false);
+
+		window.addEventListener("resize", this.updateCanvasSize.bind(this, that), false);
 	}
 };
 

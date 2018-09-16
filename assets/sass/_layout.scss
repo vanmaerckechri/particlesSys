@@ -4,29 +4,51 @@
   	width: 100%;
 	height: 100%;
 	text-align: center;
-	background-color: black;
+	background-color: white;
     .ptcSysUi
     {
+    	border-right: 1px solid black;
+    	padding-top: 50px;
     	display: flex;
-    	justify-content: center;
+    	flex-direction: column;
+    	justify-content: flex-start;
     	align-items: center;
-      	width: 100%;
-      	height: 128px;
+    	width: 250px;
+      	height: 100%;
       	background-color: white;
       	.ptcSysStartStopButton
       	{
-      		margin-right: 10px;
+      		margin: 0 10px 10px 0;
       	}
-      	.ptcSysSlidersContainer
+      	.ptcSysSlidersContainer, .ptcSysShapeAndSizeContainer
       	{
+      		margin: 0 10px 10px 0;
 	    	display: flex;
-	    	flex-direction: column;
 	    	justify-content: center;
 	    	align-items: center;
+      	}
+      	.ptcSysSlidersContainer
+      	{	    	
+      		flex-direction: column;
+      	}
+      	.ptcSysShapeAndSizeContainer
+      	{
+      		input, select
+      		{
+      			margin: 0 5px;
+      		}
+      	}
+      	.ptcSysSize
+      	{
+      		border: 1px solid black;
+      		width: 60px;
       	}
     }
     .ptcSysCanvas
     {
+    	position: absolute;
+    	top: 0;
+    	left: 250px;
 	    background-color: pink;
     }
 }
