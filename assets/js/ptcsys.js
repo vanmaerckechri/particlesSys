@@ -43,6 +43,7 @@ let PtcSys = class
 		this.startStopButton = document.getElementById("ptcSysStartStopButton");
 		this.densitySlider = document.getElementById("ptcSysDensitySlider");
 		this.emitterSpeedSlider = document.getElementById("ptcSysEmitterSpeedSlider");
+		this.emitterImpulsionSlider = document.getElementById("ptcSysEmitterImpulsionSlider");
 
 		this.particlesTimeStart;
 
@@ -51,8 +52,9 @@ let PtcSys = class
 			mainLoop: null,
 			density: 1,
 			emitterSpeed: 1,
+			emitterImpulsion: 1,
 			gravity: 9.8,
-			forceX: 0.1,
+			forceX: 0,
 			forceY: 0
 		}
 		this.particles = [];
@@ -63,28 +65,8 @@ let PtcSys = class
 
 	deleteParticles(particlesToDelete)
 	{
-		particlesToDelete = typeof particlesToDelete == "number" ? [particlesToDelete] : particlesToDelete;
-
-		if (particlesToDelete.length != 0)
-		{
-			for (let i = particlesToDelete.length - 1; i >= 0; i--)
-			{
-				this.particles[particlesToDelete[i]] = null;
-				this.particles.splice(particlesToDelete[i], 1);
-			}
-		}
-	}
-
-	drawCanvasLimits()
-	{
-		let actifCanvasWidth = this.canvas.width - 100;
-		let actifCanvasHeight = this.canvas.height - 100;
-
-		this.ctx.beginPath();
-		this.ctx.lineWidth = "1";
-		this.ctx.strokeStyle = "black";
-		this.ctx.rect(50, 50, actifCanvasWidth, actifCanvasHeight);	
-		this.ctx.stroke();	
+		this.particles[particlesToDelete] = null;
+		this.particles.splice(particlesToDelete, 1);
 	}
 
 	drawParticles(particle)
@@ -94,7 +76,7 @@ let PtcSys = class
 		this.ctx.strokeStyle = particle["color"];
 
 		particle["posX"] = particle["posX"] + this.particlesEngine["forceX"];
-		particle["posY"] = particle["posY"] + this.particlesEngine["forceY"] + this.particlesEngine["gravity"] / 10;
+		particle["posY"] = particle["posY"] + this.particlesEngine["forceY"] + this.particlesEngine["gravity"] / 10 + particle["impulsion"];
 
 		if (particle["shape"] == "circle")
 		{
@@ -106,6 +88,20 @@ let PtcSys = class
 		}
 
 		this.ctx.stroke();
+
+
+		// le reste pue => besoin d'une maj connaissances physiques basiques
+		if (particle["impulsion"] > 0)
+		{
+			if (this.particlesEngine["forceX"] != 0)
+			{
+				particle["impulsion"] = particle["impulsion"] - (particle["impulsion"] / 10);
+			}
+		}
+		else
+		{
+			particle["impulsion"] = 0;
+		}
 	}
 
 	listenParticles()
@@ -122,15 +118,13 @@ let PtcSys = class
 			{
 				// draw
 				this.drawParticles(this.particles[i]);
-				// list particles to delete
+				// delete particle(s)
 				if (this.particles[i]["posY"] < canvasTop - 100 || this.particles[i]["posY"] > canvasHeight + 100 || this.particles[i]["posX"] < -100 || this.particles[i]["posX"] > canvasWidth + 100)
 				{
-					particlesToDelete.push(i);
+					this.deleteParticles(i);
 				}
 			}
 		}
-		// delete particle(s)
-		this.deleteParticles(particlesToDelete);
 	}
 
 	countTime(timeStart, milliSec)
@@ -179,6 +173,7 @@ let PtcSys = class
 					posY: 0,
 					shape: "",
 					color: "black",
+					impulsion: this.particlesEngine["emitterImpulsion"],
 					size: 1
 				}
 				// shape
@@ -204,6 +199,12 @@ let PtcSys = class
 	updateEmitterSpeed(that)
 	{
 		that.particlesEngine["emitterSpeed"] = parseInt(30000 / that.emitterSpeedSlider.value, 10);
+	}
+
+	updateEmitterImpulsion(that)
+	{
+		let impulsionSliderValue = that.emitterImpulsionSlider.value;
+		that.particlesEngine["emitterImpulsion"] = parseInt(impulsionSliderValue, 10) / 10;
 	}
 
 	launchMainLoop(that)
@@ -268,8 +269,6 @@ let PtcSys = class
 
 	updateCanvasSize(that)
 	{
-		let ptcSysActiveZoneCanvas = document.getElementById("ptcSysActiveZoneCanvas");
-
 		that.canvas.width = window.innerWidth - document.getElementById("ptcSysUi").offsetWidth;
 		that.canvas.height = window.innerHeight;
 		that.particles = [];
@@ -282,6 +281,8 @@ let PtcSys = class
 
 		this.densitySlider.value = 1;
 		this.emitterSpeedSlider.value = 1;
+		this.emitterImpulsionSlider.value = 1;
+
 		this.updateDensity(that);
 		this.updateEmitterSpeed(that);
 
@@ -289,6 +290,7 @@ let PtcSys = class
 		// emitter
 		this.densitySlider.addEventListener("input", this.updateDensity.bind(this, that), false);
 		this.emitterSpeedSlider.addEventListener("input", this.updateEmitterSpeed.bind(this, that), false);
+		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
 		// forces
 		document.getElementById("ptcSysForceWind").addEventListener("click", this.activeForce.bind(this, "wind"), false);
 
