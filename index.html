@@ -11,13 +11,15 @@
 	<div id="ptcSysContainer" class="ptcSysContainer">
 		<div id="ptcSysUi" class="ptcSysUi">
 			<button id="ptcSysStartStopButton" class="ptcSysStartStopButton">start</button>
-			<div id="ptcSysSlidersContainer" class="ptcSysSlidersContainer">
-				<label for="ptcSysDensitySlider">density: <span id="ptcSysDensityValue" class="ptcSysDensityValue">1</span></label>
-				<input id="ptcSysDensitySlider" class="ptcSysDensitySlider" name="ptcSysDensitySlider" type="range" min="1" max="100" value="1">
-				<label for="ptcSysEmitterSpeedSlider">emitter speed: <span id="ptcSysEmitterSpeedValue" class="ptcSysEmitterSpeedValue">1</span></label>
+			<div id="ptcSysEmitterContainer" class="ptcSysEmitterContainer">
+				<h2>Emitter</h2>
+				<label for="ptcSysDensitySlider">density</label>
+				<input id="ptcSysDensitySlider" class="ptcSysDensitySlider" name="ptcSysDensitySlider" type="range" min="1" max="50" value="1">
+				<label for="ptcSysEmitterSpeedSlider">emitter speed</label>
 				<input id="ptcSysEmitterSpeedSlider" class="ptcSysEmitterSpeedSlider" name="ptcSysEmitterSpeedSlider" type="range" min="1" max="100" value="1">
 			</div>
-			<div id="ptcSysShapeAndSizeContainer" class="ptcSysShapeAndSizeContainer">
+			<div id="ptcSysParticleCustomContainer" class="ptcSysParticleCustomContainer">
+				<h2>Custom Particles</h2>
 				<label for="ptcSysShape">shape</label>
 				<select id="ptcSysShape" class="ptcSysShape" name="ptcSysShape">
 					<option value="square">square</option>
@@ -25,6 +27,10 @@
 				</select>
 				<label for="ptcSysSize">size</label>
 				<input id="ptcSysSize" class="ptcSysSize" name="ptcSysSize" type="number" step="1" value="1" min="1" max="8">
+			</div>
+			<div id="ptcSysForcesContainer" class="ptcSysForcesContainer">
+				<h2>Forces</h2>
+				<input id="ptcSysForceWind" class="ptcSysForceWind" name="ptcSysForceWind" type="button" value="wind">
 			</div>
 		</div>
 		<canvas id="ptcSysCanvas" class="ptcSysCanvas"></canvas>

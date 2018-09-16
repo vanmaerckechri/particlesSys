@@ -1,6 +1,6 @@
 "use strict";
 
-/*// -- TOOLS --
+// -- TOOLS --
 let createElem = function(createType, attributeType, attributeValue)
 {
 	let element = document.createElement(createType);
@@ -30,7 +30,7 @@ let createElem = function(createType, attributeType, attributeValue)
 		console.log("attributeType = "+ typeof attributeType);
 		console.log("attributeValue = "+typeof attributeValue);				
 	}
-};*/
+};
 
 // -- PARTICLES SYSTEM OBJECT --
 let PtcSys = class
@@ -43,8 +43,6 @@ let PtcSys = class
 		this.startStopButton = document.getElementById("ptcSysStartStopButton");
 		this.densitySlider = document.getElementById("ptcSysDensitySlider");
 		this.emitterSpeedSlider = document.getElementById("ptcSysEmitterSpeedSlider");
-		this.emitterSpeedDisplayValue = document.getElementById("ptcSysEmitterSpeedValue");
-		this.densityDisplayValue = document.getElementById("ptcSysDensityValue");
 
 		this.particlesTimeStart;
 
@@ -53,7 +51,9 @@ let PtcSys = class
 			mainLoop: null,
 			density: 1,
 			emitterSpeed: 1,
-			gravity: 9.8
+			gravity: 9.8,
+			forceX: 0.1,
+			forceY: 0
 		}
 		this.particles = [];
 		// var: frames by sec
@@ -93,6 +93,9 @@ let PtcSys = class
 		this.ctx.lineWidth = "1";
 		this.ctx.strokeStyle = particle["color"];
 
+		particle["posX"] = particle["posX"] + this.particlesEngine["forceX"];
+		particle["posY"] = particle["posY"] + this.particlesEngine["forceY"] + this.particlesEngine["gravity"] / 10;
+
 		if (particle["shape"] == "circle")
 		{
 			this.ctx.arc(particle["posX"], particle["posY"], particle["size"], 0, Math.PI * 2, true);//(x, y, r, ?)
@@ -103,7 +106,6 @@ let PtcSys = class
 		}
 
 		this.ctx.stroke();
-		particle["posY"] += particle["gravity"] / 10;
 	}
 
 	listenParticles()
@@ -177,8 +179,7 @@ let PtcSys = class
 					posY: 0,
 					shape: "",
 					color: "black",
-					size: 1,
-					gravity: this.particlesEngine["gravity"]
+					size: 1
 				}
 				// shape
 				particle["shape"] = ptcSysShape;
@@ -196,17 +197,13 @@ let PtcSys = class
 
 	updateDensity(that)
 	{
-		let canvasWidth = that.canvas.width;
 		let densitySliderValue = that.densitySlider.value;
-		
-		that.particlesEngine["density"] = parseInt(densitySliderValue / 2, 10);
-		that.densityDisplayValue.innerText = densitySliderValue;
+		that.particlesEngine["density"] = parseInt(densitySliderValue, 10) + 1;
 	}
 
 	updateEmitterSpeed(that)
 	{
 		that.particlesEngine["emitterSpeed"] = parseInt(30000 / that.emitterSpeedSlider.value, 10);
-		that.emitterSpeedDisplayValue.innerText = that.emitterSpeedSlider.value;
 	}
 
 	launchMainLoop(that)
@@ -216,6 +213,38 @@ let PtcSys = class
 		that.listenParticles();
 		that.calculFrameBySec();
 		that.particlesEngine["mainLoop"] = window.requestAnimationFrame(that.launchMainLoop.bind(this, that));
+	}
+
+	initWind()
+	{
+		let windDummyImg = createElem("img", ["src", "class"], ["assets/img/arrow.svg","windDummyImg"]);
+		let windDummyContainer = createElem("div", ["id", "class"], ["windDummyContainer","windDummyContainer"]);
+		windDummyContainer.appendChild(windDummyImg);
+		document.getElementById("ptcSysUi").appendChild(windDummyContainer);
+		windDummyContainer.style.left = this.canvas.width / 2 + 250 + "px";
+	}
+
+	deleteForce(force)
+	{
+		let forceContainer = document.getElementById(force + "DummyContainer");
+		forceContainer.remove();
+	}
+
+	activeForce(force, button)
+	{
+		if (force == "wind")
+		{
+			if (!button.target.classList.contains("forceActive"))
+			{
+				button.target.classList.add("forceActive");
+				this.initWind();
+			}
+			else
+			{
+				button.target.classList.remove("forceActive");	
+				this.deleteForce(force);
+			}
+		}
 	}
 
 	stopMainLoop(that)
@@ -257,8 +286,11 @@ let PtcSys = class
 		this.updateEmitterSpeed(that);
 
 		this.startStopButton.addEventListener("click", this.startStop.bind(this, that), false);
+		// emitter
 		this.densitySlider.addEventListener("input", this.updateDensity.bind(this, that), false);
 		this.emitterSpeedSlider.addEventListener("input", this.updateEmitterSpeed.bind(this, that), false);
+		// forces
+		document.getElementById("ptcSysForceWind").addEventListener("click", this.activeForce.bind(this, "wind"), false);
 
 		window.addEventListener("resize", this.updateCanvasSize.bind(this, that), false);
 	}

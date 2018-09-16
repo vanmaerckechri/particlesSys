@@ -8,7 +8,6 @@
     .ptcSysUi
     {
     	border-right: 1px solid black;
-    	padding-top: 50px;
     	display: flex;
     	flex-direction: column;
     	justify-content: flex-start;
@@ -16,26 +15,57 @@
     	width: 250px;
       	height: 100%;
       	background-color: white;
+      	h2
+      	{
+      		margin: 10px 0 20px;
+      		width: 100%;
+      		color: white;
+      		background-color: black;
+      	}   	
       	.ptcSysStartStopButton
       	{
-      		margin: 0 10px 10px 0;
+      		margin: 20px 10px;
       	}
-      	.ptcSysSlidersContainer, .ptcSysShapeAndSizeContainer
+      	.ptcSysEmitterContainer, .ptcSysParticleCustomContainer, .ptcSysForcesContainer
       	{
-      		margin: 0 10px 10px 0;
+      		padding: 10px;
+      		border-top: 1px solid black;
 	    	display: flex;
+	    	flex-wrap: wrap;
 	    	justify-content: center;
 	    	align-items: center;
+	    	width: 100%;
       	}
-      	.ptcSysSlidersContainer
+      	.ptcSysEmitterContainer
       	{	    	
       		flex-direction: column;
       	}
-      	.ptcSysShapeAndSizeContainer
+      	.ptcSysParticleCustomContainer
       	{
       		input, select
       		{
       			margin: 0 5px;
+      		}
+      	}
+      	.ptcSysForcesContainer
+      	{
+      		.ptcSysForceWind
+      		{
+      			border: 1px solid black;
+      			padding: 5px;
+      			background-color: white;
+      			&:hover
+      			{
+      				cursor: pointer;
+      				color: white;
+      				background-color: grey;
+      			}
+      		}
+      		.forceActive
+      		{
+   				cursor: pointer;
+  				color: white;
+  				background-color: grey; 			
       		}
       	}
       	.ptcSysSize
