@@ -40,9 +40,12 @@ let PtcSys = class
 		this.canvas = document.getElementById("ptcSysCanvas");
 		this.ctx = this.canvas.getContext("2d");
 
+		this.mousePosX = 0;
+		this.mousePosY = 0;
+
 		this.startStopButton = document.getElementById("ptcSysStartStopButton");
 		this.densitySlider = document.getElementById("ptcSysDensitySlider");
-		this.emitterSpeedSlider = document.getElementById("ptcSysEmitterSpeedSlider");
+		this.emitterFrequencySlider = document.getElementById("ptcSysEmitterFrequencySlider");
 		this.emitterImpulsionSlider = document.getElementById("ptcSysEmitterImpulsionSlider");
 
 		this.particlesTimeStart;
@@ -189,16 +192,85 @@ let PtcSys = class
 			}
 		}
 	}
+	// MOUSE POSITION
+	getMousePosition(event)
+	{
+		let canvas = document.getElementById("ptcSysCanvas");
+		this.mousePosX = event.clientX;
+		this.mousePosY = event.clientY;
+	}
 
-	updateDensity(that)
+	// EMITTER
+	moveEmitterDummy(that)
+	{
+		let canvas = document.getElementById("ptcSysCanvas");
+		let emitterDummy = document.getElementById("emitterDummy");
+		let deltaX = false;
+		let deltaY = false;
+		
+		emitterDummy.style.cursor = "move";
+
+		document.body.onmousemove = function(event)
+		{
+			let canvasTop = canvas.offsetTop;
+			let canvasLeft = canvas.offsetLeft;
+			let canvasBottom = canvasTop + canvas.offsetHeight;
+			let canvasRight = canvasLeft + canvas.offsetWidth;
+
+			let emitterDummyTop = emitterDummy.offsetTop;
+			let emitterDummyLeft = emitterDummy.offsetLeft;
+
+			that.getMousePosition(event);
+			deltaX = deltaX == false ? that.mousePosX - emitterDummyLeft : deltaX;
+			deltaY = deltaY == false ? that.mousePosY - emitterDummyTop : deltaY;
+
+			let emitterDummyNewLeft = that.mousePosX - deltaX;
+			let emitterDummyNewTop = that.mousePosY - deltaY;
+			let emitterDummyNewBottom = emitterDummyNewTop + emitterDummy.offsetHeight;
+			let emitterDummyNewRight = emitterDummyNewLeft + emitterDummy.offsetWidth;
+
+			if (emitterDummyNewLeft > canvasLeft && emitterDummyNewRight < canvasRight)
+			{
+				emitterDummy.style.left = emitterDummyNewLeft + "px";
+			}
+			else
+			{
+				deltaX = that.mousePosX - emitterDummyLeft;
+			}
+
+			if (emitterDummyNewTop > canvasTop && emitterDummyNewBottom < canvasBottom)
+			{
+				emitterDummy.style.top = emitterDummyNewTop + "px";
+			}
+			else
+			{
+				deltaY = that.mousePosY - emitterDummyTop;
+			}
+		}
+		document.body.onmouseup = function()
+		{
+			document.body.onmousemove = null;
+			document.body.onmouseup = null;
+			emitterDummy.style.cursor = "";
+		}
+	}
+
+	initEmitterDummy()
+	{
+		let emitterDummy = createElem("div", ["id", "class"], ["emitterDummy","emitterDummy"]);
+		document.getElementById("ptcSysUi").appendChild(emitterDummy);
+		return emitterDummy;
+	}
+
+	updateEmitterDensity(that)
 	{
 		let densitySliderValue = that.densitySlider.value;
 		that.particlesEngine["density"] = parseInt(densitySliderValue, 10) + 1;
 	}
 
-	updateEmitterSpeed(that)
+	updateEmitterFrequency(that)
 	{
-		that.particlesEngine["emitterSpeed"] = parseInt(30000 / that.emitterSpeedSlider.value, 10);
+		that.particlesEngine["emitterSpeed"] = parseInt(30000 / that.emitterFrequencySlider.value, 10);
 	}
 
 	updateEmitterImpulsion(that)
@@ -223,29 +295,6 @@ let PtcSys = class
 		windDummyContainer.appendChild(windDummyImg);
 		document.getElementById("ptcSysUi").appendChild(windDummyContainer);
 		windDummyContainer.style.left = this.canvas.width / 2 + 250 + "px";
-	}
-
-	deleteForce(force)
-	{
-		let forceContainer = document.getElementById(force + "DummyContainer");
-		forceContainer.remove();
-	}
-
-	activeForce(force, button)
-	{
-		if (force == "wind")
-		{
-			if (!button.target.classList.contains("forceActive"))
-			{
-				button.target.classList.add("forceActive");
-				this.initWind();
-			}
-			else
-			{
-				button.target.classList.remove("forceActive");	
-				this.deleteForce(force);
-			}
-		}
 	}
 
 	stopMainLoop(that)
@@ -277,23 +326,26 @@ let PtcSys = class
 	init()
 	{
 		let that = this;
-		this.updateCanvasSize(that);
+		// Emitter
+		let emitterDummy = this.initEmitterDummy();
+		emitterDummy.addEventListener("mousedown", this.moveEmitterDummy.bind(this, that), false);
+		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
 
+		// Buttons, range sliders, etc.
 		this.densitySlider.value = 1;
-		this.emitterSpeedSlider.value = 1;
+		this.emitterFrequencySlider.value = 1;
 		this.emitterImpulsionSlider.value = 1;
 
-		this.updateDensity(that);
-		this.updateEmitterSpeed(that);
+		this.updateEmitterDensity(that);
+		this.updateEmitterFrequency(that);
 
 		this.startStopButton.addEventListener("click", this.startStop.bind(this, that), false);
-		// emitter
-		this.densitySlider.addEventListener("input", this.updateDensity.bind(this, that), false);
-		this.emitterSpeedSlider.addEventListener("input", this.updateEmitterSpeed.bind(this, that), false);
+		this.densitySlider.addEventListener("input", this.updateEmitterDensity.bind(this, that), false);
+		this.emitterFrequencySlider.addEventListener("input", this.updateEmitterFrequency.bind(this, that), false);
 		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
-		// forces
-		document.getElementById("ptcSysForceWind").addEventListener("click", this.activeForce.bind(this, "wind"), false);
 
+		// Resize...
+		this.updateCanvasSize(that);
 		window.addEventListener("resize", this.updateCanvasSize.bind(this, that), false);
 	}
 };
