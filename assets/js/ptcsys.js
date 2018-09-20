@@ -156,8 +156,11 @@ let PtcSys = class
 		this.frameBySec += 1;
 	}
 
-	createParticles()
+	createParticles(idEmitterDummy, idBorderLimit)
 	{
+		let emitterDummy = document.getElementById(idEmitterDummy);
+		let borderLimit = document.getElementById(idBorderLimit);
+
 		let ptcSysShape = document.getElementById("ptcSysShape").value;
 		let ptcSysSize = document.getElementById("ptcSysSize").value;
 		let particlesTimeStartSave = this.particlesTimeStart;
@@ -166,27 +169,27 @@ let PtcSys = class
 		if (particlesTimeStartSave != this.particlesTimeStart)
 		{
 			// create
-			let widthPart = this.canvas.width / this.particlesEngine["density"];
+			let widthPart = emitterDummy.offsetWidth / this.particlesEngine["density"];
 			let currentWidthPart = 0;
 			for (let i = this.particlesEngine["density"] - 1; i >= 0; i--)
 			{
-				let particle = 
-				{
-					posX: 0,
-					posY: 0,
-					shape: "",
-					color: "black",
-					impulsion: this.particlesEngine["emitterImpulsion"],
-					size: 1
-				}
-				// shape
-				particle["shape"] = ptcSysShape;
-				particle["size"] = ptcSysSize;
-				// position
 				let widthStart = Math.round(currentWidthPart * widthPart);
 				let widthEnd = Math.round((currentWidthPart * widthPart) + widthPart);
-				particle["posX"] = Math.random() * (widthEnd - widthStart) + widthStart;
+				let particlePosX = (emitterDummy.offsetLeft - borderLimit.offsetLeft)  + Math.random() * (widthEnd - widthStart) + widthStart;
 
+				let emitterDummyTop = emitterDummy.offsetTop;
+				let emitterDummyBottom = emitterDummyTop + emitterDummy.offsetHeight;
+				let particlePosY = borderLimit.offsetTop + Math.random() * (emitterDummyBottom - emitterDummyTop) + emitterDummyTop;
+
+				let particle = 
+				{
+					posX: particlePosX,
+					posY: particlePosY,
+					shape: ptcSysShape,
+					color: "black",
+					impulsion: this.particlesEngine["emitterImpulsion"],
+					size: ptcSysSize
+				}
 				this.particles.push(particle);
 				currentWidthPart += 1;
 			}
@@ -320,7 +323,7 @@ let PtcSys = class
 
 	initEmitterDummy()
 	{
-		let emitterDummy = createElem("div", ["id", "class"], ["emitterDummy","emitterDummy"]);
+		let emitterDummy = createElem("div", ["id", "class"], ["ptcSysEmitterDummy","ptcSysEmitterDummy"]);
 		document.getElementById("ptcSysUi").appendChild(emitterDummy);
 		return emitterDummy;
 	}
@@ -345,7 +348,7 @@ let PtcSys = class
 	launchMainLoop(that)
 	{
 		that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
-		that.createParticles();
+		that.createParticles("ptcSysEmitterDummy", "ptcSysCanvas");
 		that.listenParticles();
 		that.calculFrameBySec();
 		that.particlesEngine["mainLoop"] = window.requestAnimationFrame(that.launchMainLoop.bind(this, that));
@@ -391,7 +394,7 @@ let PtcSys = class
 		let that = this;
 		// Emitter
 		let emitterDummy = this.initEmitterDummy();
-		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, "emitterDummy", "ptcSysCanvas"), false);
+		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, "ptcSysEmitterDummy", "ptcSysCanvas"), false);
 		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
 
 		// Buttons, range sliders, etc.
