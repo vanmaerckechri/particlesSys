@@ -46,7 +46,7 @@ let PtcSys = class
 		this.startStopButton = document.getElementById("ptcSysStartStopButton");
 		this.densitySlider = document.getElementById("ptcSysDensitySlider");
 		this.emitterFrequencySlider = document.getElementById("ptcSysEmitterFrequencySlider");
-		this.emitterImpulsionSlider = document.getElementById("ptcSysEmitterImpulsionSlider");
+		this.emitterInitialSpeedSlider = document.getElementById("ptcSysEmitterInitialSpeedSlider");
 
 		this.particlesTimeStart;
 
@@ -54,9 +54,10 @@ let PtcSys = class
 		{
 			mainLoop: null,
 			density: 1,
-			emitterSpeed: 1,
-			emitterImpulsion: 1,
-			gravity: 9.8,
+			emitterAngle: -45,
+			emitterBirthFrenquency: 1,
+			emitterInitialSpeed: 1,
+			gravity: -0.98,
 			forceX: 0,
 			forceY: 0
 		}
@@ -64,70 +65,6 @@ let PtcSys = class
 		// var: frames by sec
 		this.frameBySec = 60;
 		this.frameBySecTimeStart;
-	}
-
-	deleteParticles(particlesToDelete)
-	{
-		this.particles[particlesToDelete] = null;
-		this.particles.splice(particlesToDelete, 1);
-	}
-
-	drawParticles(particle)
-	{
-		this.ctx.beginPath();
-		this.ctx.lineWidth = "1";
-		this.ctx.strokeStyle = particle["color"];
-
-		particle["posX"] = particle["posX"] + this.particlesEngine["forceX"];
-		particle["posY"] = particle["posY"] + this.particlesEngine["forceY"] + this.particlesEngine["gravity"] / 10 + particle["impulsion"];
-
-		if (particle["shape"] == "circle")
-		{
-			this.ctx.arc(particle["posX"], particle["posY"], particle["size"], 0, Math.PI * 2, true);//(x, y, r, ?)
-		}
-		else if (particle["shape"] == "square")
-		{
-			this.ctx.rect(particle["posX"], particle["posY"], particle["size"], particle["size"]);
-		}
-
-		this.ctx.stroke();
-
-
-		// le reste pue => besoin d'une maj connaissances physiques basiques
-		if (particle["impulsion"] > 0)
-		{
-			if (this.particlesEngine["forceX"] != 0)
-			{
-				particle["impulsion"] = particle["impulsion"] - (particle["impulsion"] / 10);
-			}
-		}
-		else
-		{
-			particle["impulsion"] = 0;
-		}
-	}
-
-	listenParticles()
-	{
-		let particlesToDelete = [];
-		let canvasHeight = this.canvas.offsetHeight;
-		let canvasWidth = this.canvas.offsetWidth;
-		let canvasTop = this.canvas.offsetTop;
-		let canvasLeft = this.canvas.offsetLeft;
-
-		for (let i = this.particles.length - 1; i >= 0; i--)
-		{
-			if (typeof this.particles[i] != "undefined")
-			{
-				// draw
-				this.drawParticles(this.particles[i]);
-				// delete particle(s)
-				if (this.particles[i]["posY"] < canvasTop - 100 || this.particles[i]["posY"] > canvasHeight + 100 || this.particles[i]["posX"] < -100 || this.particles[i]["posX"] > canvasWidth + 100)
-				{
-					this.deleteParticles(i);
-				}
-			}
-		}
 	}
 
 	countTime(timeStart, milliSec)
@@ -156,6 +93,68 @@ let PtcSys = class
 		this.frameBySec += 1;
 	}
 
+	deleteParticles(particlesToDelete)
+	{
+		this.particles[particlesToDelete] = null;
+		this.particles.splice(particlesToDelete, 1);
+	}
+
+	getParabolicTrajectory(gravity, particle)
+	{
+		let oldBirthDate = particle["birthDate"];
+		particle["birthDate"] = this.countTime(particle["birthDate"], 100);
+		if (oldBirthDate != particle["birthDate"])
+		{
+			particle["age"] += 1;
+			particle["posX"] = (particle["initialSpeed"] * Math.cos(particle["initialAngle"] * Math.PI / 180.0)) * particle["age"] + particle["initialPosX"];
+			particle["posY"] = (-0.5 * gravity) * Math.pow(particle["age"], 2) + (particle["initialSpeed"] * Math.sin(particle["initialAngle"] * Math.PI / 180.0) * particle["age"] + particle["initialPosY"]);
+		}
+	}
+
+	drawParticles(particle)
+	{
+		this.ctx.beginPath();
+		this.ctx.lineWidth = "1";
+		this.ctx.strokeStyle = particle["color"];
+
+		if (particle["shape"] == "circle")
+		{
+			this.ctx.arc(particle["posX"], particle["posY"], particle["size"], 0, Math.PI * 2, true);//(x, y, r, ?)
+		}
+		else if (particle["shape"] == "square")
+		{
+			this.ctx.rect(particle["posX"], particle["posY"], particle["size"], particle["size"]);
+		}
+
+		this.ctx.stroke();
+	}
+
+	listenParticles()
+	{
+		let gravity = this.particlesEngine["gravity"];
+		let canvas = document.getElementById("ptcSysCanvas");
+		let canvasHeight = canvas.offsetHeight;
+		let canvasWidth = canvas.offsetWidth;
+		let canvasTop = canvas.offsetTop;
+		let canvasLeft = canvas.offsetLeft;
+
+		for (let i = this.particles.length - 1; i >= 0; i--)
+		{
+			if (typeof this.particles[i] != "undefined")
+			{
+				// particle posX posY age + 1
+				this.getParabolicTrajectory(gravity, this.particles[i])
+				// draw
+				this.drawParticles(this.particles[i]);
+				// delete particle(s)
+				if (this.particles[i]["posY"] < canvasTop - 100 || this.particles[i]["posY"] > canvasHeight + 100 || this.particles[i]["posX"] < -100 || this.particles[i]["posX"] > canvasWidth + 100)
+				{
+					this.deleteParticles(i);
+				}
+			}
+		}
+	}
+
 	createParticles(idEmitterDummy, idBorderLimit)
 	{
 		let emitterDummy = document.getElementById(idEmitterDummy);
@@ -164,7 +163,7 @@ let PtcSys = class
 		let ptcSysShape = document.getElementById("ptcSysShape").value;
 		let ptcSysSize = document.getElementById("ptcSysSize").value;
 		let particlesTimeStartSave = this.particlesTimeStart;
-		this.particlesTimeStart = this.countTime(this.particlesTimeStart, this.particlesEngine["emitterSpeed"]);// need to link millisec with emitter speed
+		this.particlesTimeStart = this.countTime(this.particlesTimeStart, this.particlesEngine["emitterBirthFrenquency"]);// need to link millisec with emitter speed
 
 		if (particlesTimeStartSave != this.particlesTimeStart)
 		{
@@ -183,11 +182,17 @@ let PtcSys = class
 
 				let particle = 
 				{
+					birthDate: new Date().getTime(),
+					age: 0,
+					initialSpeed: this.particlesEngine["emitterInitialSpeed"],
+					initialAngle: this.particlesEngine["emitterAngle"],
+					initialPosX: particlePosX,
+					initialPosY: particlePosY,
 					posX: particlePosX,
 					posY: particlePosY,
 					shape: ptcSysShape,
 					color: "black",
-					impulsion: this.particlesEngine["emitterImpulsion"],
+					impulsion: this.particlesEngine["emitterInitialSpeed"],
 					size: ptcSysSize
 				}
 				this.particles.push(particle);
@@ -336,13 +341,13 @@ let PtcSys = class
 
 	updateEmitterFrequency(that)
 	{
-		that.particlesEngine["emitterSpeed"] = parseInt(30000 / that.emitterFrequencySlider.value, 10);
+		that.particlesEngine["emitterBirthFrenquency"] = parseInt(3000 / that.emitterFrequencySlider.value, 10);
 	}
 
-	updateEmitterImpulsion(that)
+	updateEmitterInitialSpeed(that)
 	{
-		let impulsionSliderValue = that.emitterImpulsionSlider.value;
-		that.particlesEngine["emitterImpulsion"] = parseInt(impulsionSliderValue, 10) / 10;
+		let emitterInitialSpeedSlider = that.emitterInitialSpeedSlider.value;
+		that.particlesEngine["emitterInitialSpeed"] = parseInt(emitterInitialSpeedSlider, 10) / 2;
 	}
 
 	launchMainLoop(that)
@@ -395,12 +400,12 @@ let PtcSys = class
 		// Emitter
 		let emitterDummy = this.initEmitterDummy();
 		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, "ptcSysEmitterDummy", "ptcSysCanvas"), false);
-		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
+		this.emitterInitialSpeedSlider.addEventListener("input", this.updateEmitterInitialSpeed.bind(this, that), false);
 
 		// Buttons, range sliders, etc.
 		this.densitySlider.value = 1;
 		this.emitterFrequencySlider.value = 1;
-		this.emitterImpulsionSlider.value = 1;
+		this.emitterInitialSpeedSlider.value = 1;
 
 		this.updateEmitterDensity(that);
 		this.updateEmitterFrequency(that);
@@ -408,7 +413,6 @@ let PtcSys = class
 		this.startStopButton.addEventListener("click", this.startStop.bind(this, that), false);
 		this.densitySlider.addEventListener("input", this.updateEmitterDensity.bind(this, that), false);
 		this.emitterFrequencySlider.addEventListener("input", this.updateEmitterFrequency.bind(this, that), false);
-		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
 
 		// Resize...
 		this.updateCanvasSize(that);
