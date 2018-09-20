@@ -42,8 +42,6 @@ body {
       height: 50px;
       background-color: rgba(0, 0, 0, 0.2);
       z-index: 1; }
-      .ptcSysContainer .ptcSysUi .emitterDummy:hover {
-        cursor: pointer; }
     .ptcSysContainer .ptcSysUi .ptcSysStartStopButton {
       margin: 20px 10px; }
     .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer, .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer, .ptcSysContainer .ptcSysUi .ptcSysForcesContainer {

@@ -192,66 +192,127 @@ let PtcSys = class
 			}
 		}
 	}
-	// MOUSE POSITION
-	getMousePosition(event)
-	{
-		let canvas = document.getElementById("ptcSysCanvas");
-		this.mousePosX = event.clientX;
-		this.mousePosY = event.clientY;
-	}
-
 	// EMITTER
-	moveEmitterDummy(that)
+
+	modifyEmitterDummy(that, event)
 	{
-		let canvas = document.getElementById("ptcSysCanvas");
+		let borderLimit = document.getElementById("ptcSysCanvas");
+		let borderLimitLeft = borderLimit.offsetLeft;
+		let borderLimitRight = borderLimitLeft + borderLimit.offsetWidth;
+		let borderLimitTop = borderLimit.offsetTop;
+		let borderLimitBottom = borderLimitTop + borderLimit.offsetHeight;
+
 		let emitterDummy = document.getElementById("emitterDummy");
-		let deltaX = false;
-		let deltaY = false;
+		let emitterDummyWidth = emitterDummy.offsetWidth;
+		let emitterDummyHeight = emitterDummy.offsetHeight;
+		let emitterDummyLeft = emitterDummy.offsetLeft;
+		let emitterDummyTop = emitterDummy.offsetTop;
+		let emitterDummyBottom = emitterDummyTop + emitterDummy.offsetHeight;
+		let emitterDummyRight = emitterDummyLeft + emitterDummy.offsetWidth;
+
+		let mouseX = event.clientX;
+		let mouseY = event.clientY;
 		
-		emitterDummy.style.cursor = "move";
-
-		document.body.onmousemove = function(event)
+		// RESIZE
+		// resize by left side		
+		if (mouseX < emitterDummyLeft + 10 && mouseY > emitterDummyTop + 10 && mouseY < emitterDummyBottom - 10)
 		{
-			let canvasTop = canvas.offsetTop;
-			let canvasLeft = canvas.offsetLeft;
-			let canvasBottom = canvasTop + canvas.offsetHeight;
-			let canvasRight = canvasLeft + canvas.offsetWidth;
-
-			let emitterDummyTop = emitterDummy.offsetTop;
-			let emitterDummyLeft = emitterDummy.offsetLeft;
-
-			that.getMousePosition(event);
-			deltaX = deltaX == false ? that.mousePosX - emitterDummyLeft : deltaX;
-			deltaY = deltaY == false ? that.mousePosY - emitterDummyTop : deltaY;
-
-			let emitterDummyNewLeft = that.mousePosX - deltaX;
-			let emitterDummyNewTop = that.mousePosY - deltaY;
-			let emitterDummyNewBottom = emitterDummyNewTop + emitterDummy.offsetHeight;
-			let emitterDummyNewRight = emitterDummyNewLeft + emitterDummy.offsetWidth;
-
-			if (emitterDummyNewLeft > canvasLeft && emitterDummyNewRight < canvasRight)
+			document.body.style.cursor = "col-resize";
+			document.body.onmousemove = function(event)
 			{
-				emitterDummy.style.left = emitterDummyNewLeft + "px";
-			}
-			else
-			{
-				deltaX = that.mousePosX - emitterDummyLeft;
-			}
-
-			if (emitterDummyNewTop > canvasTop && emitterDummyNewBottom < canvasBottom)
-			{
-				emitterDummy.style.top = emitterDummyNewTop + "px";
-			}
-			else
-			{
-				deltaY = that.mousePosY - emitterDummyTop;
+				mouseX = event.clientX
+				if (mouseX > borderLimitLeft && mouseX < emitterDummyRight - 10)
+				{				
+					emitterDummy.style.left = mouseX + "px";
+					emitterDummy.style.width = emitterDummyWidth - (emitterDummy.offsetLeft - emitterDummyLeft) + "px";
+				}
 			}
 		}
-		document.body.onmouseup = function()
+		// resize by right side
+		else if (mouseX > emitterDummyRight - 10 && mouseY > emitterDummyTop + 10 && mouseY < emitterDummyBottom - 10)
+		{
+			document.body.style.cursor = "col-resize";
+			document.body.onmousemove = function(event)
+			{
+				mouseX = event.clientX
+				if (mouseX < borderLimitRight && mouseX > emitterDummyLeft + 10)
+				{		
+					emitterDummy.style.width = mouseX - emitterDummyLeft + "px";
+				}
+			}
+		}
+		// resize by top side
+		else if (mouseY < emitterDummyTop + 10 && mouseX > emitterDummyLeft + 10 && mouseX < emitterDummyRight - 10)
+		{
+			document.body.style.cursor = "row-resize";
+			document.body.onmousemove = function(event)
+			{
+				mouseY = event.clientY
+				if (mouseY > borderLimitTop && mouseY < emitterDummyBottom - 10)
+				{	
+					emitterDummy.style.top = mouseY + "px";
+					emitterDummy.style.height = emitterDummyHeight - (emitterDummy.offsetTop - emitterDummyTop) + "px";
+				}
+			}
+		}
+		// resize by bottom side
+		else if (mouseY > emitterDummyBottom - 10 && mouseX > emitterDummyLeft + 10 && mouseX < emitterDummyRight - 10)
+		{
+			document.body.style.cursor = "row-resize";
+			document.body.onmousemove = function(event)
+			{
+				mouseY = event.clientY
+				if (mouseY < borderLimitBottom && mouseY > emitterDummyTop + 10)
+				{	
+					emitterDummy.style.height = mouseY - emitterDummyTop + "px";
+				}
+			}
+		}
+		// DRAG AND DROP
+		else
+		{
+			let deltaX = false;
+			let deltaY = false;
+			document.body.style.cursor = "move";
+			document.body.onmousemove = function(event)
+			{
+
+				mouseX = event.clientX;
+				mouseY = event.clientY;
+
+				deltaX = deltaX == false ? mouseX - emitterDummyLeft : deltaX;
+				deltaY = deltaY == false ? mouseY - emitterDummyTop : deltaY;
+
+				let emitterDummyNewLeft = mouseX - deltaX;
+				let emitterDummyNewTop = mouseY - deltaY;
+				let emitterDummyNewBottom = emitterDummyNewTop + emitterDummy.offsetHeight;
+				let emitterDummyNewRight = emitterDummyNewLeft + emitterDummy.offsetWidth;
+
+				if (emitterDummyNewLeft > borderLimitLeft && emitterDummyNewRight < borderLimitRight)
+				{
+					emitterDummy.style.left = emitterDummyNewLeft + "px";
+				}
+				else
+				{
+					emitterDummyLeft = emitterDummy.offsetLeft;
+					deltaX = false;
+				}
+				if (emitterDummyNewTop > borderLimitTop && emitterDummyNewBottom < borderLimitBottom)
+				{
+					emitterDummy.style.top = emitterDummyNewTop + "px";
+				}
+				else
+				{
+					emitterDummyTop = emitterDummy.offsetTop;
+					deltaY = false;
+				}
+			}
+		}
+		document.onmouseup = function()
 		{
 			document.body.onmousemove = null;
-			document.body.onmouseup = null;
-			emitterDummy.style.cursor = "";
+			document.onmouseup = null;
+			document.body.style.cursor = "";
 		}
 	}
 
@@ -328,7 +389,7 @@ let PtcSys = class
 		let that = this;
 		// Emitter
 		let emitterDummy = this.initEmitterDummy();
-		emitterDummy.addEventListener("mousedown", this.moveEmitterDummy.bind(this, that), false);
+		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, that), false);
 		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
 
 		// Buttons, range sliders, etc.
