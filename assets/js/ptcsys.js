@@ -194,77 +194,79 @@ let PtcSys = class
 	}
 	// EMITTER
 
-	modifyEmitterDummy(that, event)
+	modifyEmitterDummy(idElemToModify, idBorderLimit, event)
 	{
-		let borderLimit = document.getElementById("ptcSysCanvas");
+		let borderLimit = document.getElementById(idBorderLimit);
+		let borderLimitWidth = borderLimit.offsetWidth;
 		let borderLimitLeft = borderLimit.offsetLeft;
-		let borderLimitRight = borderLimitLeft + borderLimit.offsetWidth;
+		let borderLimitRight = borderLimitLeft + borderLimitWidth;
 		let borderLimitTop = borderLimit.offsetTop;
 		let borderLimitBottom = borderLimitTop + borderLimit.offsetHeight;
 
-		let emitterDummy = document.getElementById("emitterDummy");
-		let emitterDummyWidth = emitterDummy.offsetWidth;
-		let emitterDummyHeight = emitterDummy.offsetHeight;
-		let emitterDummyLeft = emitterDummy.offsetLeft;
-		let emitterDummyTop = emitterDummy.offsetTop;
-		let emitterDummyBottom = emitterDummyTop + emitterDummy.offsetHeight;
-		let emitterDummyRight = emitterDummyLeft + emitterDummy.offsetWidth;
+		let elemToModify = document.getElementById(idElemToModify);
+		let elemToModifyWidth = elemToModify.offsetWidth;
+		let elemToModifyHeight = elemToModify.offsetHeight;
+		let elemToModifyLeft = elemToModify.offsetLeft;
+		let elemToModifyTop = elemToModify.offsetTop;
+		let elemToModifyBottom = elemToModifyTop + elemToModify.offsetHeight;
+		let elemToModifyRight = elemToModifyLeft + elemToModify.offsetWidth;
 
 		let mouseX = event.clientX;
 		let mouseY = event.clientY;
 		
+		elemToModify.style.position = "absolute";
 		// RESIZE
 		// resize by left side		
-		if (mouseX < emitterDummyLeft + 10 && mouseY > emitterDummyTop + 10 && mouseY < emitterDummyBottom - 10)
+		if (mouseX < elemToModifyLeft + 10 && mouseY > elemToModifyTop + 10 && mouseY < elemToModifyBottom - 10)
 		{
 			document.body.style.cursor = "col-resize";
 			document.body.onmousemove = function(event)
 			{
 				mouseX = event.clientX
-				if (mouseX > borderLimitLeft && mouseX < emitterDummyRight - 10)
+				if (mouseX > borderLimitLeft && mouseX < elemToModifyRight - 10)
 				{				
-					emitterDummy.style.left = mouseX + "px";
-					emitterDummy.style.width = emitterDummyWidth - (emitterDummy.offsetLeft - emitterDummyLeft) + "px";
+					elemToModify.style.left = mouseX + "px";
+					elemToModify.style.width = elemToModifyWidth - (elemToModify.offsetLeft - elemToModifyLeft) + "px";
 				}
 			}
 		}
 		// resize by right side
-		else if (mouseX > emitterDummyRight - 10 && mouseY > emitterDummyTop + 10 && mouseY < emitterDummyBottom - 10)
+		else if (mouseX > elemToModifyRight - 10 && mouseY > elemToModifyTop + 10 && mouseY < elemToModifyBottom - 10)
 		{
 			document.body.style.cursor = "col-resize";
 			document.body.onmousemove = function(event)
 			{
 				mouseX = event.clientX
-				if (mouseX < borderLimitRight && mouseX > emitterDummyLeft + 10)
+				if (mouseX < borderLimitRight && mouseX > elemToModifyLeft + 10)
 				{		
-					emitterDummy.style.width = mouseX - emitterDummyLeft + "px";
+					elemToModify.style.width = mouseX - elemToModifyLeft + "px";
 				}
 			}
 		}
 		// resize by top side
-		else if (mouseY < emitterDummyTop + 10 && mouseX > emitterDummyLeft + 10 && mouseX < emitterDummyRight - 10)
+		else if (mouseY < elemToModifyTop + 10 && mouseX > elemToModifyLeft + 10 && mouseX < elemToModifyRight - 10)
 		{
 			document.body.style.cursor = "row-resize";
 			document.body.onmousemove = function(event)
 			{
 				mouseY = event.clientY
-				if (mouseY > borderLimitTop && mouseY < emitterDummyBottom - 10)
+				if (mouseY > borderLimitTop && mouseY < elemToModifyBottom - 10)
 				{	
-					emitterDummy.style.top = mouseY + "px";
-					emitterDummy.style.height = emitterDummyHeight - (emitterDummy.offsetTop - emitterDummyTop) + "px";
+					elemToModify.style.top = mouseY + "px";
+					elemToModify.style.height = elemToModifyHeight - (elemToModify.offsetTop - elemToModifyTop) + "px";
 				}
 			}
 		}
 		// resize by bottom side
-		else if (mouseY > emitterDummyBottom - 10 && mouseX > emitterDummyLeft + 10 && mouseX < emitterDummyRight - 10)
+		else if (mouseY > elemToModifyBottom - 10 && mouseX > elemToModifyLeft + 10 && mouseX < elemToModifyRight - 10)
 		{
 			document.body.style.cursor = "row-resize";
 			document.body.onmousemove = function(event)
 			{
 				mouseY = event.clientY
-				if (mouseY < borderLimitBottom && mouseY > emitterDummyTop + 10)
+				if (mouseY < borderLimitBottom && mouseY > elemToModifyTop + 10)
 				{	
-					emitterDummy.style.height = mouseY - emitterDummyTop + "px";
+					elemToModify.style.height = mouseY - elemToModifyTop + "px";
 				}
 			}
 		}
@@ -280,30 +282,30 @@ let PtcSys = class
 				mouseX = event.clientX;
 				mouseY = event.clientY;
 
-				deltaX = deltaX == false ? mouseX - emitterDummyLeft : deltaX;
-				deltaY = deltaY == false ? mouseY - emitterDummyTop : deltaY;
+				deltaX = deltaX == false ? mouseX - elemToModifyLeft : deltaX;
+				deltaY = deltaY == false ? mouseY - elemToModifyTop : deltaY;
 
-				let emitterDummyNewLeft = mouseX - deltaX;
-				let emitterDummyNewTop = mouseY - deltaY;
-				let emitterDummyNewBottom = emitterDummyNewTop + emitterDummy.offsetHeight;
-				let emitterDummyNewRight = emitterDummyNewLeft + emitterDummy.offsetWidth;
+				let elemToModifyNewLeft = mouseX - deltaX;
+				let elemToModifyNewTop = mouseY - deltaY;
+				let elemToModifyNewBottom = elemToModifyNewTop + elemToModify.offsetHeight;
+				let elemToModifyNewRight = elemToModifyNewLeft + elemToModify.offsetWidth;
 
-				if (emitterDummyNewLeft > borderLimitLeft && emitterDummyNewRight < borderLimitRight)
+				if (elemToModifyNewLeft > borderLimitLeft && elemToModifyNewRight < borderLimitRight)
 				{
-					emitterDummy.style.left = emitterDummyNewLeft + "px";
+					elemToModify.style.left = elemToModifyNewLeft + "px";
 				}
 				else
 				{
-					emitterDummyLeft = emitterDummy.offsetLeft;
+					elemToModifyLeft = elemToModify.offsetLeft;
 					deltaX = false;
 				}
-				if (emitterDummyNewTop > borderLimitTop && emitterDummyNewBottom < borderLimitBottom)
+				if (elemToModifyNewTop > borderLimitTop && elemToModifyNewBottom < borderLimitBottom)
 				{
-					emitterDummy.style.top = emitterDummyNewTop + "px";
+					elemToModify.style.top = elemToModifyNewTop + "px";
 				}
 				else
 				{
-					emitterDummyTop = emitterDummy.offsetTop;
+					elemToModifyTop = elemToModify.offsetTop;
 					deltaY = false;
 				}
 			}
@@ -389,7 +391,7 @@ let PtcSys = class
 		let that = this;
 		// Emitter
 		let emitterDummy = this.initEmitterDummy();
-		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, that), false);
+		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, "emitterDummy", "ptcSysCanvas"), false);
 		this.emitterImpulsionSlider.addEventListener("input", this.updateEmitterImpulsion.bind(this, that), false);
 
 		// Buttons, range sliders, etc.
