@@ -43,6 +43,12 @@
       	{
       		margin: 20px 10px;
       	}
+        .ptcSysGravity
+        {
+          margin: 5px;
+          border: 1px solid black;
+          width: 60px;
+        }
       	.ptcSysEmitterContainer, .ptcSysParticleCustomContainer, .ptcSysForcesContainer
       	{
         	padding: 10px;
@@ -56,12 +62,50 @@
       	.ptcSysEmitterContainer
       	{	    	
       		flex-direction: column;
+          .ptcSysEmitterAngleValueContainer
+          {
+            display: flex;
+            align-items: center;
+            .ptcSysEmitterAngleValueCircle
+            {
+              margin: 0 10px;
+              border: 1px solid black;
+              border-radius: 50%;
+              position: relative;
+              display: inline-block;
+              width: 25px;
+              height: 25px;
+              background-color: pink;
+              .ptcSysEmitterAngleOrientation
+              {
+                content: "";
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 12px;
+                height: 2px;
+                transform-origin: center left;
+                background-color: black;
+              }
+            }
+            .ptcSysEmitterAngleSlider
+            {
+              width: 98px;
+            }
+          }
       	}
       	.ptcSysParticleCustomContainer
       	{
+          justify-content: flex-start;
+          label
+          {
+            padding-left: 10px;
+            width: 125px;
+            text-align: left;
+          }
       		input, select
       		{
-      			margin: 0 5px;
+      			margin: 5px 10px;
       		}
       	}
       	.ptcSysSize

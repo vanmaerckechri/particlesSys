@@ -44,6 +44,10 @@ body {
       z-index: 1; }
     .ptcSysContainer .ptcSysUi .ptcSysStartStopButton {
       margin: 20px 10px; }
+    .ptcSysContainer .ptcSysUi .ptcSysGravity {
+      margin: 5px;
+      border: 1px solid black;
+      width: 60px; }
     .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer, .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer, .ptcSysContainer .ptcSysUi .ptcSysForcesContainer {
       padding: 10px;
       border-top: 1px solid black;
@@ -54,8 +58,37 @@ body {
       width: 100%; }
     .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer {
       flex-direction: column; }
-    .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer input, .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer select {
-      margin: 0 5px; }
+      .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer .ptcSysEmitterAngleValueContainer {
+        display: flex;
+        align-items: center; }
+        .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer .ptcSysEmitterAngleValueContainer .ptcSysEmitterAngleValueCircle {
+          margin: 0 10px;
+          border: 1px solid black;
+          border-radius: 50%;
+          position: relative;
+          display: inline-block;
+          width: 25px;
+          height: 25px;
+          background-color: pink; }
+          .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer .ptcSysEmitterAngleValueContainer .ptcSysEmitterAngleValueCircle .ptcSysEmitterAngleOrientation {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 2px;
+            transform-origin: center left;
+            background-color: black; }
+        .ptcSysContainer .ptcSysUi .ptcSysEmitterContainer .ptcSysEmitterAngleValueContainer .ptcSysEmitterAngleSlider {
+          width: 98px; }
+    .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer {
+      justify-content: flex-start; }
+      .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer label {
+        padding-left: 10px;
+        width: 125px;
+        text-align: left; }
+      .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer input, .ptcSysContainer .ptcSysUi .ptcSysParticleCustomContainer select {
+        margin: 5px 10px; }
     .ptcSysContainer .ptcSysUi .ptcSysSize {
       border: 1px solid black;
       width: 60px; }

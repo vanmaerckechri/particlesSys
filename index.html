@@ -11,6 +11,10 @@
 	<div id="ptcSysContainer" class="ptcSysContainer">
 		<div id="ptcSysUi" class="ptcSysUi">
 			<button id="ptcSysStartStopButton" class="ptcSysStartStopButton">start</button>
+			<div class="gravityContainer">
+				<label for="ptcSysGravity">gravity</label>
+				<input id="ptcSysGravity" class="ptcSysGravity" name="ptcSysGravity" type="number" step=".1" value="9.8" min="0" max="20">
+			</div>
 			<div id="ptcSysEmitterContainer" class="ptcSysEmitterContainer">
 				<h2>Emitter</h2>
 				<label for="ptcSysDensitySlider">density</label>
@@ -19,6 +23,14 @@
 				<input id="ptcSysEmitterFrequencySlider" class="ptcSysEmitterFrequencySlider" name="ptcSysEmitterFrequencySlider" type="range" min="1" max="100" value="1">
 				<label for="ptcSysEmitterInitialSpeedSlider">initial speed</label>
 				<input id="ptcSysEmitterInitialSpeedSlider" class="ptcSysEmitterInitialSpeedSlider" name="ptcSysEmitterInitialSpeedSlider" type="range" min="1" max="100" value="1">
+				<div class="ptcSysEmitterAngleValueContainer">
+					<label for="ptcSysEmitterAngleSlider">angle:</label>
+					<div class="ptcSysEmitterAngleValueCircle">
+						<span id="ptcSysEmitterAngleOrientation" class="ptcSysEmitterAngleOrientation">
+						</span>
+					</div>
+					<input id="ptcSysEmitterAngleSlider" class="ptcSysEmitterAngleSlider" name="ptcSysEmitterAngleSlider" type="range" min="0" max="360" value="0">
+				</div>
 			</div>
 			<div id="ptcSysParticleCustomContainer" class="ptcSysParticleCustomContainer">
 				<h2>Custom Particles</h2>

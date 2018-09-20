@@ -47,6 +47,7 @@ let PtcSys = class
 		this.densitySlider = document.getElementById("ptcSysDensitySlider");
 		this.emitterFrequencySlider = document.getElementById("ptcSysEmitterFrequencySlider");
 		this.emitterInitialSpeedSlider = document.getElementById("ptcSysEmitterInitialSpeedSlider");
+		this.emitterAngleSlider = document.getElementById("ptcSysEmitterAngleSlider");
 
 		this.particlesTimeStart;
 
@@ -326,6 +327,34 @@ let PtcSys = class
 		}
 	}
 
+	launchMainLoop(that)
+	{
+		that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
+		that.createParticles("ptcSysEmitterDummy", "ptcSysCanvas");
+		that.listenParticles();
+		that.calculFrameBySec();
+		that.particlesEngine["mainLoop"] = window.requestAnimationFrame(that.launchMainLoop.bind(this, that));
+	}
+
+	stopMainLoop(that)
+	{
+		window.cancelAnimationFrame(that.particlesEngine["mainLoop"]);
+	}
+
+	startStop(that)
+	{
+		if (that.startStopButton.innerText == "start")
+		{
+			that.startStopButton.innerText = "stop";
+			that.launchMainLoop(that);
+		}
+		else
+		{
+			that.startStopButton.innerText = "start";	
+			that.stopMainLoop(that);
+		}
+	}
+
 	initEmitterDummy()
 	{
 		let emitterDummy = createElem("div", ["id", "class"], ["ptcSysEmitterDummy","ptcSysEmitterDummy"]);
@@ -350,41 +379,17 @@ let PtcSys = class
 		that.particlesEngine["emitterInitialSpeed"] = parseInt(emitterInitialSpeedSlider, 10) / 2;
 	}
 
-	launchMainLoop(that)
+	updateEmitterAngle(that)
 	{
-		that.ctx.clearRect(0, 0, that.canvas.width, that.canvas.height);
-		that.createParticles("ptcSysEmitterDummy", "ptcSysCanvas");
-		that.listenParticles();
-		that.calculFrameBySec();
-		that.particlesEngine["mainLoop"] = window.requestAnimationFrame(that.launchMainLoop.bind(this, that));
+		let emitterAngleSlider = that.emitterAngleSlider.value;
+		document.getElementById("ptcSysEmitterAngleOrientation").style.transform = "translate(0, -50%) rotateZ("+emitterAngleSlider+"deg)";
+		that.particlesEngine["emitterAngle"] = parseInt(emitterAngleSlider, 10);		
 	}
 
-	initWind()
+	updateGravity(that)
 	{
-		let windDummyImg = createElem("img", ["src", "class"], ["assets/img/arrow.svg","windDummyImg"]);
-		let windDummyContainer = createElem("div", ["id", "class"], ["windDummyContainer","windDummyContainer"]);
-		windDummyContainer.appendChild(windDummyImg);
-		document.getElementById("ptcSysUi").appendChild(windDummyContainer);
-		windDummyContainer.style.left = this.canvas.width / 2 + 250 + "px";
-	}
-
-	stopMainLoop(that)
-	{
-		window.cancelAnimationFrame(that.particlesEngine["mainLoop"]);
-	}
-
-	startStop(that)
-	{
-		if (that.startStopButton.innerText == "start")
-		{
-			that.startStopButton.innerText = "stop";
-			that.launchMainLoop(that);
-		}
-		else
-		{
-			that.startStopButton.innerText = "start";	
-			that.stopMainLoop(that);
-		}
+		let ptcSysGravity = document.getElementById("ptcSysGravity").value;
+		that.particlesEngine["gravity"] = -0.1 * parseInt(ptcSysGravity, 10);		
 	}
 
 	updateCanvasSize(that)
@@ -399,20 +404,28 @@ let PtcSys = class
 		let that = this;
 		// Emitter
 		let emitterDummy = this.initEmitterDummy();
+		let gravitySlider = document.getElementById("ptcSysGravity");
 		emitterDummy.addEventListener("mousedown", this.modifyEmitterDummy.bind(this, "ptcSysEmitterDummy", "ptcSysCanvas"), false);
-		this.emitterInitialSpeedSlider.addEventListener("input", this.updateEmitterInitialSpeed.bind(this, that), false);
 
 		// Buttons, range sliders, etc.
 		this.densitySlider.value = 1;
 		this.emitterFrequencySlider.value = 1;
 		this.emitterInitialSpeedSlider.value = 1;
+		this.emitterAngleSlider.value = 0;
+		gravitySlider.value = 9.8;
 
 		this.updateEmitterDensity(that);
 		this.updateEmitterFrequency(that);
+		this.updateEmitterAngle(that);
+		this.updateGravity(that);
 
 		this.startStopButton.addEventListener("click", this.startStop.bind(this, that), false);
 		this.densitySlider.addEventListener("input", this.updateEmitterDensity.bind(this, that), false);
 		this.emitterFrequencySlider.addEventListener("input", this.updateEmitterFrequency.bind(this, that), false);
+		this.emitterInitialSpeedSlider.addEventListener("input", this.updateEmitterInitialSpeed.bind(this, that), false);
+		this.emitterAngleSlider.addEventListener("input", this.updateEmitterAngle.bind(this, that), false);
+
+		gravitySlider.addEventListener("input", this.updateGravity.bind(this, that), false);
 
 		// Resize...
 		this.updateCanvasSize(that);
