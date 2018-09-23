@@ -1,0 +1,16 @@
+Sans frottements...
+
+Travail d'une force(W en joule(J))
+W = F * L
+F: force(Newton)
+L: distance(mètre)
+
+Energie cinétique(Ec en joule):
+Ec = 1 / 2 mv²
+m: masse(kg)
+v: vitesse(m/s)
+
+Energie potentielle(Ep en joule):
+Ep = mgh
+g: gravité(newton/kg)
+h: hauteur(mètre)

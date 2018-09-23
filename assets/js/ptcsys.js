@@ -107,8 +107,8 @@ let PtcSys = class
 		if (oldBirthDate != particle["birthDate"])
 		{
 			particle["age"] += 1;
-			particle["posX"] = (particle["initialSpeed"] * Math.cos(particle["initialAngle"] * Math.PI / 180.0)) * particle["age"] + particle["initialPosX"];
-			particle["posY"] = (-0.5 * gravity) * Math.pow(particle["age"], 2) + (particle["initialSpeed"] * Math.sin(particle["initialAngle"] * Math.PI / 180.0) * particle["age"] + particle["initialPosY"]);
+			particle["posX"] = particle["initialSpeedX"] * particle["age"] + particle["initialPosX"];
+			particle["posY"] = (-0.5 * gravity) * Math.pow(particle["age"], 2) + (particle["initialSpeedY"] * particle["age"] + particle["initialPosY"]);
 		}
 	}
 
@@ -181,19 +181,22 @@ let PtcSys = class
 				let emitterDummyBottom = emitterDummyTop + emitterDummy.offsetHeight;
 				let particlePosY = borderLimit.offsetTop + Math.random() * (emitterDummyBottom - emitterDummyTop) + emitterDummyTop;
 
+				let initialAngle = this.particlesEngine["emitterAngle"] * Math.PI / 180.0;//angle => radian
+				let inistialSpeedX = this.particlesEngine["emitterInitialSpeed"] * Math.cos(initialAngle);
+				let inistialSpeedY = this.particlesEngine["emitterInitialSpeed"] * Math.sin(initialAngle);
 				let particle = 
 				{
 					birthDate: new Date().getTime(),
 					age: 0,
-					initialSpeed: this.particlesEngine["emitterInitialSpeed"],
-					initialAngle: this.particlesEngine["emitterAngle"],
+					initialSpeedX: inistialSpeedX,
+					initialSpeedY: inistialSpeedY,
+					initialAngle: initialAngle,
 					initialPosX: particlePosX,
 					initialPosY: particlePosY,
 					posX: particlePosX,
 					posY: particlePosY,
 					shape: ptcSysShape,
 					color: "black",
-					impulsion: this.particlesEngine["emitterInitialSpeed"],
 					size: ptcSysSize
 				}
 				this.particles.push(particle);
